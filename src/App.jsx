@@ -2,6 +2,7 @@
 import './App.css'
 import Home from "./Home.jsx";
 import Progress from "./Progress.jsx";
+import AddHabit from "./AddHabit.jsx";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 
@@ -12,6 +13,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/progress" element={<Progress />} />
+        <Route path="/add" element={<AddHabit />} />
       </Routes>
     </Router>
   )

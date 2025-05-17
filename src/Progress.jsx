@@ -464,4 +464,5 @@ const StreakLabel = styled.div`
   font-style: italic;
   margin-top: 8px;
   text-align: center;
-`;
+  `
+;

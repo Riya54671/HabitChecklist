@@ -93,13 +93,7 @@ const Home = () => {
     );
   };
 
-  const handleNav = (section) => {
-    if (section === "progress") {
-      navigate("/progress");
-    } else {
-      alert(`Navigate to ${section}`);
-    }
-  };
+  
 
   const filteredHabits = habits.filter((h) => h.type === selectedFilter);
 
@@ -124,7 +118,7 @@ const Home = () => {
       <ContentWrapper>
         <Sidebar>
           <SidebarButton
-            onClick={() => handleNav("progress")}
+            onClick={() => navigate("/progress")}
             tabIndex={0}
             aria-label="List"
           >

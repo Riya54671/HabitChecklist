@@ -1,13 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
-import { FaFire, FaBook, FaBed, FaDumbbell, FaSpa } from "react-icons/fa";
-import { useNavigate } from "react-router-dom"
+import {
+  FaDumbbell, FaSpa, FaRunning, FaBed, FaSwimmer, FaBook,
+  FaAppleAlt, FaBicycle, FaLeaf, FaMusic, FaPaintBrush, FaUtensils, FaSmile, FaLaptop, FaDog, FaFire
+} from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+
+// Icon mapping for string-to-component rendering
+const iconMap = {
+  FaDumbbell: <FaDumbbell color="#1976d2" />,
+  FaSpa: <FaSpa color="#1976d2" />,
+  FaRunning: <FaRunning color="#1976d2" />,
+  FaBed: <FaBed color="#1976d2" />,
+  FaSwimmer: <FaSwimmer color="#1976d2" />,
+  FaBook: <FaBook color="#1976d2" />,
+  FaAppleAlt: <FaAppleAlt color="#1976d2" />,
+  FaBicycle: <FaBicycle color="#1976d2" />,
+  FaLeaf: <FaLeaf color="#1976d2" />,
+  FaMusic: <FaMusic color="#1976d2" />,
+  FaPaintBrush: <FaPaintBrush color="#1976d2" />,
+  FaUtensils: <FaUtensils color="#1976d2" />,
+  FaSmile: <FaSmile color="#1976d2" />,
+  FaLaptop: <FaLaptop color="#1976d2" />,
+  FaDog: <FaDog color="#1976d2" />,
+  FaFire: <FaFire color="#1976d2" />,
+};
+
 // Mock Data
 const mockHabits = [
-  { id: 1, name: "Sleep", details: "6/8 hrs", time: "10:00 am", completed: true, type: "Daily", icon: <FaBed /> },
-  { id: 2, name: "Read", details: "10 pages", time: "8:00 pm", completed: false, type: "Daily", icon: <FaBook /> },
-  { id: 3, name: "Exercise", details: "30 min", time: "7:00 am", completed: false, type: "Weekly", icon: <FaDumbbell /> },
-  { id: 4, name: "Meditate", details: "15 min", time: "6:30 am", completed: false, type: "Monthly", icon: <FaSpa /> },
+  { id: 1, name: "Sleep", details: "6/8 hrs", time: "10:00 am", completed: true, type: "Daily", icon: "FaBed" },
+  { id: 2, name: "Read", details: "10 pages", time: "8:00 pm", completed: false, type: "Daily", icon: "FaBook" },
+  { id: 3, name: "Exercise", details: "30 min", time: "7:00 am", completed: false, type: "Weekly", icon: "FaDumbbell" },
+  { id: 4, name: "Meditate", details: "15 min", time: "6:30 am", completed: false, type: "Monthly", icon: "FaSpa" },
 ];
 const filters = ["Daily", "Weekly", "Monthly"];
 
@@ -32,25 +56,34 @@ function getDateArray(centerDate = new Date(), range = 3) {
 const Home = () => {
   const today = new Date();
   const [selectedFilter, setSelectedFilter] = useState("Daily");
-  const [habits, setHabits] = useState(mockHabits);
+  const [habits, setHabits] = useState([]);
   const [selectedDate, setSelectedDate] = useState(today);
- const navigate = useNavigate();
+  const navigate = useNavigate();
   const dates = getDateArray(selectedDate, 2);
 
-  const handleAddHabit = () => {
-    setHabits([
-      ...habits,
-      {
-        id: habits.length + 1,
-        name: "New Habit",
-        details: "0/1",
-        time: "12:00 pm",
-        completed: false,
-        type: selectedFilter,
-        icon: <FaBook />, // Default icon
-      },
-    ]);
-  };
+  // Load habits from localStorage on mount
+ useEffect(() => {
+  const storedHabits = JSON.parse(localStorage.getItem("habits"));
+  if (storedHabits && storedHabits.length > 0) {
+    setHabits(
+      storedHabits.map(h =>
+        typeof h.icon === "string"
+          ? h
+          : { ...h, icon: "FaSmile" }
+      )
+    );
+  } else {
+    setHabits(mockHabits);
+    localStorage.setItem("habits", JSON.stringify(mockHabits));
+  }
+}, []);
+
+  // Save habits to localStorage when habits change
+  useEffect(() => {
+    if (habits.length > 0) {
+      localStorage.setItem("habits", JSON.stringify(habits));
+    }
+  }, [habits]);
 
   const handleToggleHabit = (id) => {
     setHabits((prev) =>
@@ -62,12 +95,11 @@ const Home = () => {
 
   const handleNav = (section) => {
     if (section === "progress") {
-      navigate("/progress"); 
+      navigate("/progress");
     } else {
       alert(`Navigate to ${section}`);
     }
   };
-
 
   const filteredHabits = habits.filter((h) => h.type === selectedFilter);
 
@@ -96,14 +128,12 @@ const Home = () => {
             tabIndex={0}
             aria-label="List"
           >
-            {/* ...icon... */}
             <svg width="32" height="32" viewBox="0 0 100 100" fill="currentColor">
               <path fillRule="evenodd" clipRule="evenodd" d="M12.5 25C12.5 21.6848 13.817 18.5054 16.1612 16.1612C18.5054 13.817 21.6848 12.5 25 12.5H75C78.3152 12.5 81.4946 13.817 83.8388 16.1612C86.183 18.5054 87.5 21.6848 87.5 25V75C87.5 78.3152 86.183 81.4946 83.8388 83.8388C81.4946 86.183 78.3152 87.5 75 87.5H25C21.6848 87.5 18.5054 86.183 16.1612 83.8388C13.817 81.4946 12.5 78.3152 12.5 75V25ZM54.1667 33.3333C54.1667 32.2283 53.7277 31.1685 52.9463 30.3871C52.1649 29.6057 51.1051 29.1667 50 29.1667C48.8949 29.1667 47.8351 29.6057 47.0537 30.3871C46.2723 31.1685 45.8333 32.2283 45.8333 33.3333V66.6667C45.8333 67.7717 46.2723 68.8315 47.0537 69.6129C47.8351 70.3943 48.8949 70.8333 50 70.8333C51.1051 70.8333 52.1649 70.3943 52.9463 69.6129C53.7277 68.8315 54.1667 67.7717 54.1667 66.6667V33.3333ZM37.5 45.8333C37.5 44.7283 37.061 43.6685 36.2796 42.8871C35.4982 42.1057 34.4384 41.6667 33.3333 41.6667C32.2283 41.6667 31.1685 42.1057 30.3871 42.8871C29.6057 43.6685 29.1667 44.7283 29.1667 45.8333V66.6667C29.1667 67.7717 29.6057 68.8315 30.3871 69.6129C31.1685 70.3943 32.2283 70.8333 33.3333 70.8333C34.4384 70.8333 35.4982 70.3943 36.2796 69.6129C37.061 68.8315 37.5 67.7717 37.5 66.6667V45.8333ZM70.8333 58.3333C70.8333 57.2283 70.3943 56.1685 69.6129 55.3871C68.8315 54.6057 67.7717 54.1667 66.6667 54.1667C65.5616 54.1667 64.5018 54.6057 63.7204 55.3871C62.939 56.1685 62.5 57.2283 62.5 58.3333V66.6667C62.5 67.7717 62.939 68.8315 63.7204 69.6129C64.5018 70.3943 65.5616 70.8333 66.6667 70.8333C67.7717 70.8333 68.8315 70.3943 69.6129 69.6129C70.3943 68.8315 70.8333 67.7717 70.8333 66.6667V58.3333Z"/>
             </svg>
           </SidebarButton>
-          {/* ...other sidebar buttons... */}
           <SidebarButton
-            onClick={handleAddHabit}
+            onClick={() => navigate("/add")}
             tabIndex={0}
             aria-label="Add Habit"
           >
@@ -111,15 +141,7 @@ const Home = () => {
               <path d="M50 0C22.3828 0 0 22.3828 0 50C0 77.6172 22.3828 100 50 100C77.6172 100 100 77.6172 100 50C100 22.3828 77.6172 0 50 0ZM79.1602 54.1602C79.1602 56.4648 77.3047 58.3203 75 58.3203H58.3398V75C58.3398 77.3047 56.4844 79.1602 54.1797 79.1602H45.8398C43.5352 79.1602 41.6797 77.2852 41.6797 75V58.3398H25C22.6953 58.3398 20.8398 56.4648 20.8398 54.1797V45.8398C20.8398 43.5352 22.6953 41.6797 25 41.6797H41.6602V25C41.6602 22.6953 43.5156 20.8398 45.8203 20.8398H54.1602C56.4648 20.8398 58.3203 22.7148 58.3203 25V41.6602H75C77.3047 41.6602 79.1602 43.5352 79.1602 45.8203V54.1602Z"/>
             </svg>
           </SidebarButton>
-          <SidebarButton
-            onClick={() => handleNav("clipboard")}
-            tabIndex={0}
-            aria-label="Clipboard"
-          >
-            <svg width="32" height="32" viewBox="0 0 100 100" fill="currentColor">
-              <path d="M31.25 6.25C32.0788 6.25 32.8737 6.57924 33.4597 7.16529C34.0458 7.75134 34.375 8.5462 34.375 9.375V12.5H46.875V9.375C46.875 8.5462 47.2042 7.75134 47.7903 7.16529C48.3763 6.57924 49.1712 6.25 50 6.25C50.8288 6.25 51.6237 6.57924 52.2097 7.16529C52.7958 7.75134 53.125 8.5462 53.125 9.375V12.5H65.625V9.375C65.625 8.5462 65.9542 7.75134 66.5403 7.16529C67.1263 6.57924 67.9212 6.25 68.75 6.25C69.5788 6.25 70.3737 6.57924 70.9597 7.16529C71.5458 7.75134 71.875 8.5462 71.875 9.375V12.5C74.3614 12.5 76.746 13.4877 78.5041 15.2459C80.2623 17.004 81.25 19.3886 81.25 21.875V37.725C78.0046 38.2879 75.0132 39.8425 72.6875 42.175L64.3062 50.5625C63.7767 50.1929 63.1457 49.9964 62.5 50H37.5C36.6712 50 35.8763 50.3292 35.2903 50.9153C34.7042 51.5013 34.375 52.2962 34.375 53.125C34.375 53.9538 34.7042 54.7487 35.2903 55.3347C35.8763 55.9208 36.6712 56.25 37.5 56.25H58.6187L45.8875 68.975C45.1083 69.7583 44.3875 70.5917 43.725 71.475C43.6278 70.7216 43.2594 70.0294 42.6889 69.5279C42.1183 69.0264 41.3846 68.7498 40.625 68.75H37.5C36.6712 68.75 35.8763 69.0792 35.2903 69.6653C34.7042 70.2513 34.375 71.0462 34.375 71.875C34.375 72.7038 34.7042 73.4987 35.2903 74.0847C35.8763 74.6708 36.6712 75 37.5 75H40.625C40.9583 75.0006 41.2896 74.9478 41.6063 74.8438C40.771 76.4642 40.125 78.1755 39.6812 79.9438L37.7875 87.5125C37.2628 89.585 37.4162 91.771 38.225 93.75H28.125C25.6386 93.75 23.254 92.7623 21.4959 91.0041C19.7377 89.246 18.75 86.8614 18.75 84.375V21.875C18.75 19.3886 19.7377 17.004 21.4959 15.2459C23.254 13.4877 25.6386 12.5 28.125 12.5V9.375C28.125 8.5462 28.4542 7.75134 29.0403 7.16529C29.6263 6.57924 30.4212 6.25 31.25 6.25ZM34.375 34.375C34.375 35.2038 34.7042 35.9987 35.2903 36.5847C35.8763 37.1708 36.6712 37.5 37.5 37.5H62.5C63.3288 37.5 64.1237 37.1708 64.7097 36.5847C65.2958 35.9987 65.625 35.2038 65.625 34.375C65.625 33.5462 65.2958 32.7513 64.7097 32.1653C64.1237 31.5792 63.3288 31.25 62.5 31.25H37.5C36.6712 31.25 35.8763 31.5792 35.2903 32.1653C34.7042 32.7513 34.375 33.5462 34.375 34.375ZM77.1125 46.5938C78.9417 44.7646 81.4225 43.737 84.0094 43.737C86.5962 43.737 89.0771 44.7646 90.9062 46.5938C92.7354 48.4229 93.763 50.9038 93.763 53.4906C93.763 56.0775 92.7354 58.5583 90.9062 60.3875L64.1 87.1875C61.8719 89.4072 59.0867 90.9855 56.0375 91.7562L48.4688 93.65C47.8298 93.8102 47.1602 93.802 46.5253 93.6264C45.8904 93.4507 45.3118 93.1135 44.846 92.6477C44.3802 92.1819 44.043 91.6034 43.8674 90.9685C43.6917 90.3336 43.6836 89.664 43.8438 89.025L45.7437 81.4625C46.5062 78.4062 48.0812 75.6188 50.3062 73.4L77.1125 46.5938Z"/>
-            </svg>
-          </SidebarButton>
+         
         </Sidebar>
         <CenterColumn>
           <FilterRow>
@@ -140,7 +162,11 @@ const Home = () => {
               )}
               {filteredHabits.map((habit) => (
                 <HabitCard key={habit.id}>
-                  <HabitIcon>{habit.icon}</HabitIcon>
+                  <HabitIcon>
+                    {typeof habit.icon === "string"
+                      ? iconMap[habit.icon] || <FaSmile color="#1976d2" />
+                      : <FaSmile color="#1976d2" />}
+                  </HabitIcon>
                   <HabitInfo>
                     <HabitName>{habit.name}</HabitName>
                     <HabitDetails>
@@ -249,8 +275,9 @@ const FilterRow = styled.div`
   justify-content: center;
   width: 100%;
 `;
-
-const FilterButton = styled.button`
+const FilterButton = styled.button.withConfig({
+  shouldForwardProp: (prop) => prop !== "active"
+})`
   background: ${({ active }) => (active ? "#ffb74d" : "#fff")};
   color: #d84315;
   border: none;
@@ -262,7 +289,6 @@ const FilterButton = styled.button`
   box-shadow: ${({ active }) => (active ? "0 2px 8px #ffecb3" : "none")};
   transition: background 0.2s;
 `;
-
 const CenterColumn = styled.div`
   display: flex;
   flex-direction: column;
@@ -356,10 +382,10 @@ const HabitCard = styled.div`
 `;
 
 const HabitIcon = styled.div`
-  font-size: 2.8rem;         // Bigger icon
-  margin-right: 24px;        // More space to the right
+  font-size: 2.8rem;
+  margin-right: 24px;
   color: #1976d2;
-  flex-shrink: 0;            // Prevent shrinking
+  flex-shrink: 0;
 `;
 
 const HabitInfo = styled.div`
@@ -371,21 +397,18 @@ const HabitInfo = styled.div`
 
 const HabitName = styled.div`
   font-weight: bold;
-  font-size: 1.25rem;        // Bigger text
+  font-size: 1.25rem;
   color: #111;
 `;
 
 const HabitDetails = styled.div`
   color: #616161;
-  font-size: 1.05rem;        // Slightly bigger details
+  font-size: 1.05rem;
   display: flex;
-  gap: 12px;                 // More gap between details
+  gap: 12px;
   align-items: center;
-  margin-top: 4px;           // More space above details
+  margin-top: 4px;
 `;
-
-// ...existing code...
-
 
 const CheckBox = styled.input`
   width: 24px;
@@ -427,7 +450,6 @@ const AnimatedFire = styled.div`
   color: #ff5722;
   animation: ${fireAnim} 1.2s infinite;
 `;
-
 const StreakCount = styled.div`
   color: #ff5722;
   font-size: 3.2rem;

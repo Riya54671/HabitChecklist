@@ -3,7 +3,7 @@ import './App.css'
 import Home from "./Home.jsx";
 import Progress from "./Progress.jsx";
 import AddHabit from "./AddHabit.jsx";
-import { BrowserRouter as Routes , Route } from "react-router-dom";
+import { Routes , Route } from "react-router-dom";
 
 
 function App() {

@@ -58,8 +58,8 @@ const Home = () => {
   const [selectedFilter, setSelectedFilter] = useState("Daily");
   const [habits, setHabits] = useState([]);
   const [selectedDate, setSelectedDate] = useState(today);
-  const navigate = useNavigate();
   const dates = getDateArray(selectedDate, 2);
+  const navigate = useNavigate();
 
   // Load habits from localStorage on mount
  useEffect(() => {
